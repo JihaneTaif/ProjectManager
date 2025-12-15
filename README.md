@@ -24,3 +24,8 @@ cd frontend
 npm install
 npm run dev
 ```
+
+
+## Intent behind the backend folder structure:
+I used a layered structure inspired by clean architecture to separate domain logic from technical concerns like persistence and security.
+
