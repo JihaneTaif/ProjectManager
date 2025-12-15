@@ -32,9 +32,13 @@ public class Project extends BaseEntity {
     // ===== Constructors =====
     protected Project() {}
 
-    public Project(String title, String description, User user) {
+    public Project(String title, String description) {
         this.title = title;
         this.description = description;
+       
+    }
+     /** domain relation method */
+    public void assignToUser(User user) {
         this.user = user;
     }
 
@@ -55,6 +59,8 @@ public class Project extends BaseEntity {
         }
         return (int) ((getCompletedTasks() * 100) / tasks.size());
     }
+
+    
 
     // ===== Getters =====
 

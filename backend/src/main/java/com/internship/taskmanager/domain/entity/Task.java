@@ -28,12 +28,15 @@ public class Task extends BaseEntity {
     // ===== Constructors =====
     protected Task() {}
 
-    public Task(String title, String description, LocalDate dueDate, Project project) {
+    public Task(String title, String description, LocalDate dueDate) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
-        this.project = project;
         this.status = TaskStatus.TODO;
+    }
+     /** domain relation method */
+    public void assignToProject(Project project) {
+        this.project = project;
     }
 
     // ===== Domain behavior =====
