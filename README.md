@@ -27,5 +27,5 @@ npm run dev
 
 
 ## Intent behind the backend folder structure:
-I used a layered structure inspired by clean architecture to separate domain logic from technical concerns like persistence and security.
+I  applied Clean Architecture principles by isolating domain logic, keeping services as application use cases, and decoupling web concerns using DTOs.
 

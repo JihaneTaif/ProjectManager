@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="72ffd42e-0643-460b-86ca-8c5b6ee1c64c" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Interface" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="36qL97PZ2Rk6KchJp300eGsvPCA" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.ProjectServiceTest.executor": "Run",
+    "JUnit.ProjectServiceTest.testCreateProject.executor": "Run",
+    "JUnit.RepositoryIntegrationTest.executor": "Run",
+    "JUnit.TaskServiceTest.executor": "Run",
+    "JUnit.TaskServiceTest.testCreateTask.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main"
+  }
+}]]></component>
+  <component name="RunManager" selected="JUnit.RepositoryIntegrationTest">
+    <configuration name="ProjectServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="task-manager" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.internship.taskmanager.application.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.internship.taskmanager.application.service" />
+      <option name="MAIN_CLASS_NAME" value="com.internship.taskmanager.application.service.ProjectServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProjectServiceTest.testCreateProject" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="task-manager" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.internship.taskmanager.application.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.internship.taskmanager.application.service" />
+      <option name="MAIN_CLASS_NAME" value="com.internship.taskmanager.application.service.ProjectServiceTest" />
+      <option name="METHOD_NAME" value="testCreateProject" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RepositoryIntegrationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="task-manager" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.internship.taskmanager.domain.repository.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.internship.taskmanager.domain.repository" />
+      <option name="MAIN_CLASS_NAME" value="com.internship.taskmanager.domain.repository.RepositoryIntegrationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TaskServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="task-manager" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.internship.taskmanager.application.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.internship.taskmanager.application.service" />
+      <option name="MAIN_CLASS_NAME" value="com.internship.taskmanager.application.service.TaskServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TaskServiceTest.testCreateTask" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="task-manager" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.internship.taskmanager.application.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.internship.taskmanager.application.service" />
+      <option name="MAIN_CLASS_NAME" value="com.internship.taskmanager.application.service.TaskServiceTest" />
+      <option name="METHOD_NAME" value="testCreateTask" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.RepositoryIntegrationTest" />
+        <item itemvalue="JUnit.TaskServiceTest" />
+        <item itemvalue="JUnit.ProjectServiceTest" />
+        <item itemvalue="JUnit.ProjectServiceTest.testCreateProject" />
+        <item itemvalue="JUnit.TaskServiceTest.testCreateTask" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="72ffd42e-0643-460b-86ca-8c5b6ee1c64c" name="Changes" comment="" />
+      <created>1765729002039</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765729002039</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/src/main/java/com/internship/taskmanager/domain/entity/Task.java</url>
+          <line>5</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
