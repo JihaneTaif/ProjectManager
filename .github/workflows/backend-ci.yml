@@ -30,3 +30,4 @@ jobs:
 
       - name: Build and run tests
         run: mvn clean verify
+        working-directory: backend
