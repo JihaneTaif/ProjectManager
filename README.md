@@ -11,7 +11,7 @@ A fullstack task management application allowing users to manage projects and ta
 - Frontend: 
    React 
    Tailwind CSS
-- Infrastructure
+- Infrastructure:
    Docker & Docker Compose
    GitHub Actions (CI)
 
