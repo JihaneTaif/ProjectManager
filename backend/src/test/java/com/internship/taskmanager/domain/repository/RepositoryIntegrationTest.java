@@ -3,9 +3,7 @@ package com.internship.taskmanager.domain.repository;
 import com.internship.taskmanager.domain.entity.Project;
 import com.internship.taskmanager.domain.entity.Task;
 import com.internship.taskmanager.domain.entity.User;
-import com.internship.taskmanager.domain.repository.ProjectRepository;
-import com.internship.taskmanager.domain.repository.TaskRepository;
-import com.internship.taskmanager.domain.repository.UserRepository;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;

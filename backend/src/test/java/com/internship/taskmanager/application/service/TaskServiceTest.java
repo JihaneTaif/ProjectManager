@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class TaskServiceTest {
@@ -28,42 +29,60 @@ class TaskServiceTest {
         taskService = new TaskService(taskRepository, projectRepository);
     }
 
-    @Test
-    void testCreateTask() {
-        User user = new User("u@mail.com", "pass");
-        Project project = new Project("Project A", "Desc");
-        project.assignToUser(user);
 
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
-        when(taskRepository.save(any(Task.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+   @Test
+void testCreateTask() {
+    // GIVEN
+    User user = mock(User.class);
+    when(user.getId()).thenReturn(1L);
 
-        Task created = taskService.createTask(
-                "Task 1",
-                "Desc",
-                LocalDate.now(),
-                1L
-        );
+    Project project = new Project("Project A", "Desc");
+    project.assignToUser(user);
 
-        assertEquals("Task 1", created.getTitle());
-        assertEquals(project, created.getProject());
-    }
+    when(projectRepository.findById(1L))
+            .thenReturn(Optional.of(project));
 
-    @Test
-    void testCompleteTask() {
-        User user = new User("u@mail.com", "pass");
-        Project project = new Project("Project A", "Desc");
-        project.assignToUser(user);
+    when(taskRepository.save(any(Task.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
 
-        Task task = new Task("Task 1", "Desc", LocalDate.now());
-        task.assignToProject(project);
+    // WHEN
+    Task created = taskService.createTask(
+            "Task 1",
+            "Desc",
+            LocalDate.now(),
+            1L,   // projectId
+            1L    // userId
+    );
 
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-        when(taskRepository.save(any(Task.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+    // THEN
+    assertEquals("Task 1", created.getTitle());
+    assertEquals(project, created.getProject());
+}
 
-        Task completed = taskService.completeTask(1L);
 
-        assertEquals(TaskStatus.DONE, completed.getStatus());
-    }
+   @Test
+void testCompleteTask() {
+    // GIVEN
+    User user = mock(User.class);
+    when(user.getId()).thenReturn(1L);
+
+    Project project = new Project("Project A", "Desc");
+    project.assignToUser(user);
+
+    Task task = new Task("Task 1", "Desc", LocalDate.now());
+    task.assignToProject(project);
+
+    when(taskRepository.findById(1L))
+            .thenReturn(Optional.of(task));
+
+    when(taskRepository.save(any(Task.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+    // WHEN
+    Task completed = taskService.completeTask(1L, 1L);
+
+    // THEN
+    assertEquals(TaskStatus.DONE, completed.getStatus());
+}
+
 }

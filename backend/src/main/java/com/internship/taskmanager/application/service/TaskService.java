@@ -1,18 +1,15 @@
-package com.internship.taskmanager.application.service;
 
-import com.internship.taskmanager.domain.entity.Project;
-import com.internship.taskmanager.domain.entity.Task;
-import com.internship.taskmanager.domain.entity.TaskStatus;
-import com.internship.taskmanager.domain.repository.ProjectRepository;
-import com.internship.taskmanager.domain.repository.TaskRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+package com.internship.taskmanager.application.service;
+import com.internship.taskmanager.domain.entity.*;
+import com.internship.taskmanager.domain.repository.*;
+import org.springframework.data.domain.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
-import java.util.List;
+
+
+
 
 @Service
 @Transactional
@@ -26,10 +23,22 @@ public class TaskService {
         this.projectRepository = projectRepository;
     }
 
-    // Create a task
-    public Task createTask(String title, String description, LocalDate dueDate, Long projectId) {
+    // ✅ CREATE task (with ownership check)
+    public Task createTask(
+            String title,
+            String description,
+            LocalDate dueDate,
+            Long projectId,
+            Long userId
+    ) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found with id: " + projectId));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Project not found with id: " + projectId));
+
+        // 🔐 Ownership check
+        if (!project.getUser().getId().equals(userId)) {
+            throw new SecurityException("You do not own this project");
+        }
 
         Task task = new Task(title, description, dueDate);
         task.assignToProject(project);
@@ -37,36 +46,56 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    // Get all tasks for a project
-    public List<Task> getTasksByProject(Long projectId) {
-        return taskRepository.findByProjectId(projectId);
-    }
-
-    // Pagination + filtering + search
+    // ✅ GET tasks (pagination + filters + ownership)
     public Page<Task> getTasksByProjectWithFilters(
             Long projectId,
             TaskStatus status,
             String title,
             int page,
-            int size
+            int size,
+            Long userId
     ) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Project not found with id: " + projectId));
+
+        // 🔐 Ownership check
+        if (!project.getUser().getId().equals(userId)) {
+            throw new SecurityException("You do not own this project");
+        }
+
         Pageable pageable = PageRequest.of(page, size);
-        return taskRepository.findByProjectIdWithFilters(projectId, status, title, pageable);
+        return taskRepository.findByProjectIdWithFilters(
+                projectId, status, title, pageable);
     }
 
-    // Complete a task
-    public Task completeTask(Long taskId) {
+    // ✅ COMPLETE task (ownership via project)
+    public Task completeTask(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found with id: " + taskId));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Task not found with id: " + taskId));
+
+        Project project = task.getProject();
+
+        // 🔐 Ownership check
+        if (!project.getUser().getId().equals(userId)) {
+            throw new SecurityException("You do not own this task");
+        }
 
         task.markAsCompleted();
         return taskRepository.save(task);
     }
 
-    // Delete a task
-    public void deleteTask(Long taskId) {
+    // (Optional) DELETE task
+    public void deleteTask(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found with id: " + taskId));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Task not found with id: " + taskId));
+
+        if (!task.getProject().getUser().getId().equals(userId)) {
+            throw new SecurityException("You do not own this task");
+        }
+
         taskRepository.delete(task);
     }
 }

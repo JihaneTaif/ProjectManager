@@ -1,13 +1,16 @@
 package com.internship.taskmanager.web.controller;
 
-
-
-import com.internship.taskmanager.web.dto.project.*;
 import com.internship.taskmanager.application.service.ProjectService;
+import com.internship.taskmanager.domain.repository.UserRepository;
 import com.internship.taskmanager.domain.entity.Project;
+import com.internship.taskmanager.domain.entity.User;
+import com.internship.taskmanager.web.dto.project.*;
+
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -16,37 +19,46 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final UserRepository userRepository;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectService projectService, UserRepository userRepository) {
         this.projectService = projectService;
+        this.userRepository = userRepository;
     }
 
     // CREATE project
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(
             @Valid @RequestBody CreateProjectRequest request,
-            @RequestParam Long userId
+            Authentication authentication
     ) {
+        // Get user email from JWT
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         Project project = projectService.createProject(
                 request.getTitle(),
                 request.getDescription(),
-                userId
+                user.getId()
         );
 
-        ProjectResponse response = new ProjectResponse(
+        return ResponseEntity.ok(new ProjectResponse(
                 project.getId(),
                 project.getTitle(),
                 project.getDescription(),
                 project.getProgressPercentage()
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
 
-    // GET projects by user
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ProjectResponse>> getProjects(@PathVariable Long userId) {
-        List<ProjectResponse> responses = projectService.getProjectsByUser(userId)
+    // GET all my projects
+    @GetMapping
+    public ResponseEntity<List<ProjectResponse>> getMyProjects(Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<ProjectResponse> responses = projectService.getProjectsByUser(user.getId())
                 .stream()
                 .map(p -> new ProjectResponse(
                         p.getId(),
@@ -61,8 +73,12 @@ public class ProjectController {
 
     // DELETE project
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
-        projectService.deleteProject(projectId);
+    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        projectService.deleteProject(projectId, user.getId());
         return ResponseEntity.noContent().build();
     }
 }
