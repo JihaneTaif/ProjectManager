@@ -43,6 +43,13 @@ public class Project extends BaseEntity {
     }
 
     // ===== Domain logic =====
+    public void update(String title, String description) {
+        if (title != null && !title.trim().isEmpty()) {
+            this.title = title;
+        }
+        this.description = description;
+    }
+
     public int getTotalTasks() {
         return tasks.size();
     }

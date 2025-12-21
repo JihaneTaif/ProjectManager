@@ -40,6 +40,14 @@ public class Task extends BaseEntity {
     }
 
     // ===== Domain behavior =====
+    public void update(String title, String description, LocalDate dueDate) {
+        if (title != null && !title.trim().isEmpty()) {
+            this.title = title;
+        }
+        this.description = description;
+        this.dueDate = dueDate;
+    }
+
     public void markAsCompleted() {
         this.status = TaskStatus.DONE;
     }

@@ -63,4 +63,11 @@ public class ProjectService {
         Project project = getProject(projectId, authenticatedUserId);
         projectRepository.delete(project);
     }
+
+    // ✅ UPDATE project with ownership check
+    public Project updateProject(Long projectId, String title, String description, Long authenticatedUserId) {
+        Project project = getProject(projectId, authenticatedUserId);
+        project.update(title, description);
+        return projectRepository.save(project);
+    }
 }

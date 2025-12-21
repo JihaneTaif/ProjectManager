@@ -10,26 +10,30 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) setUser({ token });
+    const email = localStorage.getItem("email");
+    if (token) setUser({ token, email });
   }, []);
 
-  const login = async (email, password) => {
-    const res = await loginApi({ email, password });
+  const login = async (emailInput, password) => {
+    const res = await loginApi({ email: emailInput, password });
     const token = res.data.token;
+    const email = res.data.email;
     if (!token) {
       throw new Error("No token received from server");
     }
     localStorage.setItem("token", token);
-    setUser({ token });
+    localStorage.setItem("email", email);
+    setUser({ token, email });
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("email");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user,setUser, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,51 +1,71 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { getProjects, createProject } from "../api/projectApi";
+import { getProjects, createProject, updateProject } from "../api/projectApi";
 import { AuthContext } from "../context/AuthContext";
 import ProjectCard from "../components/ProjectCard";
+import { useNotification } from "../context/NotificationContext";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [newProject, setNewProject] = useState({ title: "", description: "" });
-  const { logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const { addNotification } = useNotification();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
       const res = await getProjects();
       setProjects(res.data);
     } catch (err) {
-      setError("Failed to load projects. Please try again.");
       console.error("Error fetching projects:", err);
+      addNotification("Failed to load projects", "error");
     } finally {
       setLoading(false);
     }
-  };
+  }, [addNotification]);
 
-  const handleCreateProject = async (e) => {
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const handleSubmitProject = async (e) => {
     e.preventDefault();
+    if (!newProject.title.trim()) {
+      addNotification("Project title is required", "error");
+      return;
+    }
     try {
-      await createProject(newProject);
+      if (editingProject) {
+        await updateProject(editingProject.id, newProject);
+        addNotification("Project updated successfully!", "success");
+      } else {
+        await createProject(newProject);
+        addNotification("Project created successfully!", "success");
+      }
       setNewProject({ title: "", description: "" });
       setShowCreateForm(false);
+      setEditingProject(null);
       fetchProjects();
     } catch (err) {
-      alert("Failed to create project. Please try again.");
-      console.error("Error creating project:", err);
+      addNotification(editingProject ? "Could not update project" : "Could not create project", "error");
+      console.error("Error submitting project:", err);
     }
   };
 
+  const handleEditClick = (project) => {
+    setEditingProject(project);
+    setNewProject({ title: project.title, description: project.description });
+    setShowCreateForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleDeleteProject = (projectId) => {
-    setProjects(projects.filter(p => p.id !== projectId));
+    setProjects(prev => prev.filter(p => p.id !== projectId));
+    addNotification("Project removed", "info");
   };
 
   const handleLogout = () => {
@@ -53,84 +73,109 @@ export default function Dashboard() {
     navigate("/login");
   };
 
+  // Stats calculation
+  const totalProjects = projects.length;
+  const avgProgress = totalProjects > 0
+    ? Math.round(projects.reduce((acc, p) => acc + (p.progressPercentage || 0), 0) / totalProjects)
+    : 0;
+  const completedProjects = projects.filter(p => p.progressPercentage === 100).length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-              My Projects
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Manage your projects and tasks efficiently
-            </p>
+    <div className="min-h-screen pb-20 bg-slate-50 dark:bg-slate-950">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Compact Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div className="flex items-center gap-4">
+
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                {user?.email?.split('@')[0] || 'User'}'s <span className="text-indigo-600 dark:text-indigo-400">Workspace</span>
+              </h1>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                {totalProjects} Active Projects
+              </p>
+            </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3 w-full md:w-auto">
             <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+              onClick={() => {
+                setEditingProject(null);
+                setNewProject({ title: "", description: "" });
+                setShowCreateForm(!showCreateForm);
+              }}
+              className="flex-1 md:flex-none px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              New Project
+              {showCreateForm && !editingProject ? "Close Hub" : "New Project"}
             </button>
             <button
               onClick={handleLogout}
-              className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+              className="p-2.5 text-slate-400 hover:text-rose-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl transition-all"
+              title="Logout"
             >
-              Logout
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
             </button>
           </div>
         </div>
 
-        {/* Create Project Form */}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="glass p-5 rounded-2xl shadow-sm border-l-4 border-indigo-500">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Projects</p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white">{totalProjects}</h3>
+          </div>
+          <div className="glass p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Efficiency Rate </p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white">{avgProgress}%</h3>
+          </div>
+          <div className="glass p-5 rounded-2xl shadow-sm border-l-4 border-amber-500">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Finished Projects</p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white">{completedProjects} Done</h3>
+          </div>
+        </div>
+
+        {/* Create Project Form - Compact Overlay */}
         {showCreateForm && (
-          <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              Create New Project
+          <div className="glass rounded-2xl p-6 mb-8 animate-fade-in shadow-xl border-2 border-indigo-100 dark:border-indigo-900/30">
+            <h2 className="text-sm font-black text-slate-900 dark:text-white mb-4 uppercase tracking-widest">
+              {editingProject ? "Update Project Details" : "Setup New Project"}
             </h2>
-            <form onSubmit={handleCreateProject} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Title *
-                </label>
+            <form onSubmit={handleSubmitProject} className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 space-y-4">
                 <input
                   type="text"
-                  placeholder="Project title"
+                  placeholder="Project Name"
                   value={newProject.title}
                   onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  required
+                  className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-indigo-500 transition-all text-sm dark:text-white"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Description
-                </label>
-                <textarea
-                  placeholder="Project description"
+                <input
+                  type="text"
+                  placeholder="Short Description..."
                   value={newProject.description}
                   onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  rows="3"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-indigo-500 transition-all text-sm dark:text-white"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex md:flex-col gap-2">
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+                  className="flex-1 px-6 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
                 >
-                  Create
+                  {editingProject ? "Update" : "Create"}
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setShowCreateForm(false);
+                    setEditingProject(null);
                     setNewProject({ title: "", description: "" });
                   }}
-                  className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition-colors"
+                  className="px-6 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-300 dark:hover:bg-slate-700 transition-all"
                 >
                   Cancel
                 </button>
@@ -139,40 +184,34 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        {/* Loading State */}
+        {/* Projects Grid */}
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-44 rounded-2xl bg-slate-200 dark:bg-slate-800 animate-pulse"></div>
+            ))}
           </div>
         ) : projects.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-            <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No projects yet
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Get started by creating your first project
-            </p>
+          <div className="glass rounded-3xl py-24 text-center border-2 border-dashed border-slate-200 dark:border-slate-800">
+            <div className="relative inline-block mb-6">
+              <div className="absolute inset-0 bg-indigo-500/10 blur-2xl rounded-full scale-150"></div>
+              <svg className="relative mx-auto h-16 w-16 text-slate-300 dark:text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-widest mb-2">No Projects Detected</h3>
+            <p className="text-slate-500 text-sm max-w-xs mx-auto mb-8 tracking-wide italic">Your workspace is currently quiet. Time to launch something new.</p>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+              className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-xl shadow-indigo-500/20 transition-all"
             >
-              Create Project
+              Start New Project
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
             {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} onDelete={handleDeleteProject} />
+              <ProjectCard key={project.id} project={project} onDelete={handleDeleteProject} onEdit={handleEditClick} />
             ))}
           </div>
         )}

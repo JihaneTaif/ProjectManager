@@ -113,4 +113,32 @@ public class TaskController {
         taskService.deleteTask(taskId, user.getId());
         return ResponseEntity.noContent().build();
     }
+
+    // UPDATE task
+    @PutMapping("/{taskId}")
+    public ResponseEntity<TaskResponse> updateTask(
+            @PathVariable Long taskId,
+            @Valid @RequestBody com.internship.taskmanager.web.dto.task.UpdateTaskRequest request,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
+
+        Task task = taskService.updateTask(
+                taskId,
+                request.getTitle(),
+                request.getDescription(),
+                request.getDueDate(),
+                user.getId()
+        );
+
+        return ResponseEntity.ok(new TaskResponse(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getDueDate(),
+                task.getStatus()
+        ));
+    }
 }

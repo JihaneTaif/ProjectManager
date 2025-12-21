@@ -39,7 +39,7 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(email); // Token gets the email as typed/sent
 
-        return ResponseEntity.ok(new AuthResponse(token));
+        return ResponseEntity.ok(new AuthResponse(token, email));
     }
 
     @PostMapping("/register")

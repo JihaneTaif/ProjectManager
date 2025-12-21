@@ -104,4 +104,18 @@ public class TaskService {
 
         taskRepository.delete(task);
     }
+
+    // ✅ UPDATE task with ownership check
+    public Task updateTask(Long taskId, String title, String description, LocalDate dueDate, Long userId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Task not found with id: " + taskId));
+
+        if (!task.getProject().getUser().getId().equals(userId)) {
+            throw new SecurityException("You do not own this task");
+        }
+
+        task.update(title, description, dueDate);
+        return taskRepository.save(task);
+    }
 }

@@ -26,5 +26,8 @@ export const createTask = (projectId, data) =>
 export const completeTask = (taskId) =>
   apiClient.patch(`/tasks/${taskId}/complete`);
 
+export const updateTask = (taskId, data) =>
+  apiClient.put(`/tasks/${taskId}`, data);
+
 export const deleteTask = (taskId) =>
   apiClient.delete(`/tasks/${taskId}`);

@@ -47,6 +47,8 @@ public class ProjectController {
                 project.getId(),
                 project.getTitle(),
                 project.getDescription(),
+                project.getTotalTasks(),
+                (int) project.getCompletedTasks(),
                 project.getProgressPercentage()
         ));
     }
@@ -57,18 +59,39 @@ public class ProjectController {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email.toLowerCase())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
-
+ 
         List<ProjectResponse> responses = projectService.getProjectsByUser(user.getId())
                 .stream()
                 .map(p -> new ProjectResponse(
                         p.getId(),
                         p.getTitle(),
                         p.getDescription(),
+                        p.getTotalTasks(),
+                        (int) p.getCompletedTasks(),
                         p.getProgressPercentage()
                 ))
                 .toList();
 
         return ResponseEntity.ok(responses);
+    }
+
+    // ✅ PROGRESS calculation endpoint
+    @GetMapping("/{projectId}/progress")
+    public ResponseEntity<ProjectResponse> getProjectProgress(@PathVariable Long projectId, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
+
+        Project project = projectService.getProject(projectId, user.getId());
+        
+        return ResponseEntity.ok(new ProjectResponse(
+                project.getId(),
+                project.getTitle(),
+                project.getDescription(),
+                project.getTotalTasks(),
+                (int) project.getCompletedTasks(),
+                project.getProgressPercentage()
+        ));
     }
 
     // DELETE project
@@ -80,5 +103,33 @@ public class ProjectController {
 
         projectService.deleteProject(projectId, user.getId());
         return ResponseEntity.noContent().build();
+    }
+
+    // UPDATE project
+    @PutMapping("/{projectId}")
+    public ResponseEntity<ProjectResponse> updateProject(
+            @PathVariable Long projectId,
+            @Valid @RequestBody UpdateProjectRequest request,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
+
+        Project project = projectService.updateProject(
+                projectId,
+                request.getTitle(),
+                request.getDescription(),
+                user.getId()
+        );
+
+        return ResponseEntity.ok(new ProjectResponse(
+                project.getId(),
+                project.getTitle(),
+                project.getDescription(),
+                project.getTotalTasks(),
+                (int) project.getCompletedTasks(),
+                project.getProgressPercentage()
+        ));
     }
 }
