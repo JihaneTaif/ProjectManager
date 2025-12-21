@@ -60,13 +60,19 @@ public class TaskService {
                         "Project not found with id: " + projectId));
 
         // 🔐 Ownership check
-        if (!project.getUser().getId().equals(userId)) {
-            throw new SecurityException("You do not own this project");
+        Long projectOwnerId = project.getUser().getId();
+        System.out.println("DEBUG: Task fetch for projectId=" + projectId + " | projectOwnerId=" + projectOwnerId + " | requestUserId=" + userId);
+        
+        if (!projectOwnerId.equals(userId)) {
+            System.out.println("DEBUG: Ownership mismatch! projectOwnerId=" + projectOwnerId + " != requestUserId=" + userId);
+            throw new SecurityException("You do not own this project (ID: " + projectId + "). Access denied.");
         }
 
         Pageable pageable = PageRequest.of(page, size);
+        String searchTitle = (title != null && !title.isEmpty()) ? "%" + title.toLowerCase() + "%" : null;
+        
         return taskRepository.findByProjectIdWithFilters(
-                projectId, status, title, pageable);
+                projectId, status, searchTitle, pageable);
     }
 
     // ✅ COMPLETE task (ownership via project)

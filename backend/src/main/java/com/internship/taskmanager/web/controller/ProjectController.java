@@ -34,8 +34,8 @@ public class ProjectController {
     ) {
         // Get user email from JWT
         String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
 
         Project project = projectService.createProject(
                 request.getTitle(),
@@ -55,8 +55,8 @@ public class ProjectController {
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> getMyProjects(Authentication authentication) {
         String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
 
         List<ProjectResponse> responses = projectService.getProjectsByUser(user.getId())
                 .stream()
@@ -75,8 +75,8 @@ public class ProjectController {
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId, Authentication authentication) {
         String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
 
         projectService.deleteProject(projectId, user.getId());
         return ResponseEntity.noContent().build();

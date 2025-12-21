@@ -11,8 +11,9 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Secret key used to sign the token
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // Hardcoded secret for development (In production, use environment variables!)
+    private static final String SECRET_STRING = "ThisIsASecretKeyThatIsAtLeast32BytesLongForHS256Security";
+    private final Key key = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(java.nio.charset.StandardCharsets.UTF_8));
 
     // Token validity: 24 hours
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;

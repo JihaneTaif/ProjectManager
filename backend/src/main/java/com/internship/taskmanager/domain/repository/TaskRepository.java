@@ -18,7 +18,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t " +
            "WHERE t.project.id = :projectId " +
            "AND (:status IS NULL OR t.status = :status) " +
-           "AND (:title IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :title, '%')))")
+           "AND (:title IS NULL OR LOWER(t.title) LIKE :title)")
     Page<Task> findByProjectIdWithFilters(
             @Param("projectId") Long projectId,
             @Param("status") TaskStatus status,

@@ -33,8 +33,8 @@ public class TaskController {
             Authentication authentication
     ) {
         String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
 
         Task task = taskService.createTask(
                 request.getTitle(),
@@ -64,8 +64,8 @@ public class TaskController {
             Authentication authentication
     ) {
         String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
 
         Page<Task> tasksPage = taskService.getTasksByProjectWithFilters(
                 projectId, status, title, page, size, user.getId()
@@ -89,8 +89,8 @@ public class TaskController {
             Authentication authentication
     ) {
         String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
 
         Task task = taskService.completeTask(taskId, user.getId());
 
@@ -107,8 +107,8 @@ public class TaskController {
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId, Authentication authentication) {
         String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
 
         taskService.deleteTask(taskId, user.getId());
         return ResponseEntity.noContent().build();

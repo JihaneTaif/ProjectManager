@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
+@SuppressWarnings("null")
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -37,10 +37,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
             String token = authHeader.substring(7);
+            System.out.println("Processing token: " + token.substring(0, Math.min(token.length(), 10)) + "...");
 
             if (jwtUtil.isTokenValid(token)) {
-
                 String username = jwtUtil.extractUsername(token);
+                System.out.println("Token valid for user: " + username);
 
                 UserDetails userDetails =
                         userDetailsService.loadUserByUsername(username);
@@ -60,8 +61,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext()
                         .setAuthentication(authentication);
             }
+        } else {
+            if (!"OPTIONS".equalsIgnoreCase(request.getMethod())) {
+                System.out.println("DEBUG: No Bearer token found in request to " + request.getRequestURI());
+            }
         }
 
+
+
+        // Just proceed without try/catch to avoid interference with Spring Security's own exception handling
         filterChain.doFilter(request, response);
     }
+
+   
+
 }

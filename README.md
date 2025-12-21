@@ -54,7 +54,7 @@ http://localhost:8081
 
 ## Frontend (local currently)
 ```bash
-cd frontend
+cd frontend/vite-project   
 npm install
 npm run dev
 ```
