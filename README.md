@@ -1,3 +1,4 @@
+
 # Task Manager – Fullstack Mini Project
 A fullstack task management application allowing users to manage projects and tasks with secure authentication.
 
@@ -65,8 +66,14 @@ npm run dev
 ```
 
 
-## CI / CD
+## CI /CD
 A simple GitHub Actions CI workflow is configured to automatically:
 -Build the backend
 -Run unit and integration tests
     The workflow runs on every push and pull request to ensure code quality and prevent regressions.
+
+
+
+##  Short Demo Video
+A short demo video showcasing the application's features and functionality is available at:
+[Demo Video Link](https://drive.google.com/file/d/1MpgYhfg3J1zlo-PqKa-79yjj99yT05LX/view?usp=sharing)
