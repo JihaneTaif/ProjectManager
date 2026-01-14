@@ -74,6 +74,4 @@ A simple GitHub Actions CI workflow is configured to automatically:
 
 
 
-##  Short Demo Video
-A short demo video showcasing the application's features and functionality is available at:
-[Demo Video Link](https://drive.google.com/file/d/1MpgYhfg3J1zlo-PqKa-79yjj99yT05LX/view?usp=sharing)
+
